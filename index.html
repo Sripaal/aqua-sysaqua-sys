@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Water Purification</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+
+body{
+    background:#f4f8fb;
+    color:#172b3a;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:245px;
+    background:#102b3f;
+    color:white;
+    padding:25px 18px;
+    position:fixed;
+    height:100vh;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:35px;
+}
+
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:#27a9d6;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+.logo h2{
+    font-size:16px;
+}
+
+.logo span{
+    display:block;
+    font-size:10px;
+    color:#8da8b8;
+    margin-top:3px;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.nav-item{
+    padding:13px 14px;
+    border-radius:9px;
+    color:#a9c0cd;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.nav-item:hover,
+.nav-item.active{
+    background:#1c465f;
+    color:white;
+}
+
+.sidebar-bottom{
+    position:absolute;
+    bottom:25px;
+    left:18px;
+    right:18px;
+}
+
+.sim-badge{
+    border:1px solid #3c6172;
+    color:#9ec4d3;
+    padding:9px;
+    border-radius:8px;
+    text-align:center;
+    font-size:11px;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:245px;
+    width:calc(100% - 245px);
+    padding:28px 35px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.title h1{
+    font-size:27px;
+    font-weight:700;
+}
+
+.title p{
+    color:#718694;
+    margin-top:5px;
+    font-size:13px;
+}
+
+.status-area{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.online{
+    padding:7px 12px;
+    border-radius:20px;
+    background:#e4f7ee;
+    color:#15804d;
+    font-size:12px;
+    font-weight:600;
+}
+
+.time{
+    color:#7a8d98;
+    font-size:12px;
+}
+
+/* BUTTONS */
+
+.controls{
+    display:flex;
+    gap:10px;
+    margin-bottom:22px;
+}
+
+button{
+    border:none;
+    cursor:pointer;
+    border-radius:9px;
+    padding:12px 19px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.start{
+    background:#168fc1;
+    color:white;
+}
+
+.start:hover{
+    background:#107da9;
+    transform:translateY(-1px);
+}
+
+.reset{
+    background:white;
+    color:#526874;
+    border:1px solid #d8e2e8;
+}
+
+.reset:hover{
+    background:#f0f5f8;
+}
+
+/* CARDS */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+
+.card{
+    background:white;
+    border:1px solid #e1e9ee;
+    border-radius:13px;
+    padding:19px;
+    box-shadow:0 3px 12px rgba(30,60,80,.04);
+}
+
+.metric-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.metric-name{
+    font-size:13px;
+    color:#687d89;
+}
+
+.metric-icon{
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    background:#edf7fb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#138db9;
+}
+
+.metric-value{
+    font-size:28px;
+    font-weight:700;
+    margin:12px 0 8px;
+}
+
+.metric-status{
+    font-size:11px;
+    font-weight:700;
+    color:#15905a;
+}
+
+.warning{
+    color:#d68118;
+}
+
+.danger{
+    color:#d54c4c;
+}
+
+/* CONTENT */
+
+.content{
+    display:grid;
+    grid-template-columns:1.5fr 1fr;
+    gap:18px;
+    margin-top:18px;
+}
+
+.card-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:17px;
+}
+
+.card-title h3{
+    font-size:15px;
+}
+
+.small-label{
+    color:#8497a2;
+    font-size:11px;
+}
+
+/* WORKFLOW */
+
+.workflow{
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+}
+
+.step{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px;
+    border:1px solid #e7edf1;
+    border-radius:9px;
+}
+
+.step-number{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#edf2f5;
+    color:#778b96;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.step-text{
+    flex:1;
+}
+
+.step-name{
+    font-size:12px;
+    font-weight:600;
+}
+
+.step-status{
+    font-size:10px;
+    color:#93a2aa;
+    margin-top:3px;
+}
+
+.step-status.processing{
+    color:#d78a1b;
+}
+
+.step-status.completed{
+    color:#15905a;
+}
+
+.step.active .step-number{
+    background:#fff0d7;
+    color:#d58213;
+}
+
+.step.completed .step-number{
+    background:#dff6eb;
+    color:#158b57;
+}
+
+/* ALERT */
+
+.alert{
+    margin-top:18px;
+    padding:14px 16px;
+    border-radius:10px;
+    background:#fff6e7;
+    border:1px solid #f2dfba;
+    display:none;
+}
+
+.alert.show{
+    display:block;
+}
+
+.alert strong{
+    color:#b9700c;
+    font-size:13px;
+}
+
+.alert p{
+    color:#806d52;
+    font-size:11px;
+    margin-top:4px;
+}
+
+/* CHART */
+
+.chart-box{
+    height:255px;
+}
+
+/* MICROPLASTIC */
+
+.microplastic{
+    margin-top:18px;
+}
+
+.micro-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.microscope{
+    height:220px;
+    border-radius:10px;
+    background:
+    radial-gradient(circle at 25% 30%,#89a7b4 0 3px,transparent 4px),
+    radial-gradient(circle at 70% 65%,#6e9cac 0 5px,transparent 6px),
+    radial-gradient(circle at 45% 70%,#b6d0d8 0 4px,transparent 5px),
+    radial-gradient(circle at 80% 25%,#7296a4 0 3px,transparent 4px),
+    radial-gradient(circle at 35% 50%,#a7c5ce 0 6px,transparent 7px),
+    #183744;
+    position:relative;
+    overflow:hidden;
+}
+
+.microscope:before,
+.microscope:after{
+    content:"";
+    position:absolute;
+    border:2px solid #51c9e8;
+    width:30px;
+    height:20px;
+    border-radius:4px;
+    opacity:0;
+}
+
+.microscope:before{
+    left:23%;
+    top:27%;
+}
+
+.microscope:after{
+    right:20%;
+    bottom:24%;
+}
+
+.detecting .microscope:before,
+.detecting .microscope:after{
+    opacity:1;
+    animation:pulse 1s infinite alternate;
+}
+
+@keyframes pulse{
+    from{opacity:.3}
+    to{opacity:1}
+}
+
+.ai-info{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.ai-number{
+    font-size:36px;
+    font-weight:700;
+    margin:10px 0;
+}
+
+.ai-status{
+    font-size:12px;
+    color:#788c97;
+}
+
+.confidence{
+    margin-top:15px;
+    height:7px;
+    border-radius:10px;
+    background:#e7eef2;
+    overflow:hidden;
+}
+
+.confidence-fill{
+    width:0%;
+    height:100%;
+    background:#25a5c9;
+    transition:1s;
+}
+
+/* BEFORE AFTER */
+
+.comparison{
+    margin-top:18px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:11px 8px;
+    text-align:left;
+    border-bottom:1px solid #edf1f3;
+    font-size:12px;
+}
+
+th{
+    color:#758893;
+    font-weight:600;
+}
+
+.after{
+    color:#16865a;
+    font-weight:700;
+}
+
+/* FINAL */
+
+.final{
+    margin-top:18px;
+    padding:22px;
+    background:white;
+    border:1px solid #e1e9ee;
+    border-radius:13px;
+    text-align:center;
+}
+
+.final-icon{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:#e1f7ec;
+    color:#15905a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
+    margin:0 auto 10px;
+}
+
+.final h2{
+    font-size:18px;
+}
+
+.final p{
+    font-size:11px;
+    color:#7b8e99;
+    margin-top:6px;
+}
+
+.final.pending .final-icon{
+    background:#eef2f4;
+    color:#84939b;
+}
+
+.log{
+    margin-top:14px;
+    background:#102b3f;
+    color:#b8ced9;
+    border-radius:10px;
+    padding:13px;
+    font-family:monospace;
+    font-size:10px;
+    max-height:100px;
+    overflow:auto;
+}
+
+.log div{
+    margin-bottom:5px;
+}
+
+
+/* YOLO LIVE DETECTION */
+.yolo-summary{margin-top:12px;padding:12px;border:1px solid #dce8ee;border-radius:10px;background:#f8fbfd;}
+.yolo-summary-title{font-size:10px;letter-spacing:.08em;color:#7890a0;margin-bottom:8px;}
+.detection-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #e8eef2;font-size:12px;color:#274052;}
+.detection-row:first-child{border-top:0;}
+.yolo-controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    margin-bottom:14px;
+}
+.yolo-btn{
+    background:#168fc1;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:10px 13px;
+    font-size:11px;
+    font-weight:700;
+}
+.yolo-btn:hover{background:#107da9}
+.yolo-btn.secondary{
+    background:#eef5f8;
+    color:#365361;
+    border:1px solid #d8e3e8;
+}
+.yolo-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+.camera-panel{
+    margin-bottom:14px;
+    background:#102b3f;
+    border-radius:10px;
+    overflow:hidden;
+}
+#cameraVideo{
+    display:block;
+    width:100%;
+    max-height:320px;
+    object-fit:contain;
+    background:#081c27;
+}
+.yolo-result-wrap{
+    min-height:220px;
+    border-radius:10px;
+    overflow:hidden;
+    background:#183744;
+    position:relative;
+}
+#yoloResultImage{
+    width:100%;
+    height:220px;
+    object-fit:contain;
+    background:#102b3f;
+}
+.yolo-placeholder{
+    height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#9fc0cc;
+    font-size:12px;
+    text-align:center;
+    padding:20px;
+}
+.yolo-live-badge{
+    display:inline-block;
+    margin-left:8px;
+    padding:3px 7px;
+    border-radius:10px;
+    background:#e4f7ee;
+    color:#15804d;
+    font-size:9px;
+    font-weight:700;
+}
+
+@media(max-width:1000px){
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .content,
+    .micro-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:700px){
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        margin-left:0;
+        width:100%;
+        padding:20px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .topbar{
+        align-items:flex-start;
+        gap:15px;
+        flex-direction:column;
+    }
+}
+
+/* ONE-SHOT DEMO UPGRADE */
+.yolo-tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px;padding:12px;background:#f7fbfd;border:1px solid #e0ebf0;border-radius:10px;}
+.threshold-wrap{display:flex;align-items:center;gap:8px;font-size:11px;color:#5d7480;}
+#confSlider{width:150px;accent-color:#168fc1;}
+#confValue{font-weight:700;color:#168fc1;min-width:38px;}
+.alert-panel{display:none;margin-top:12px;padding:13px 15px;border-radius:10px;border:1px solid #f0c9a4;background:#fff7ed;}
+.alert-panel.show{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.alert-title{font-weight:700;color:#a95711;font-size:13px;}
+.alert-text{font-size:11px;color:#785f4d;margin-top:3px;}
+.alert-badge{padding:6px 10px;border-radius:20px;background:#ffe4c7;color:#a95711;font-size:10px;font-weight:700;white-space:nowrap;}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
+.score-card,.history-card{background:white;border:1px solid #e1e9ee;border-radius:13px;padding:19px;box-shadow:0 3px 12px rgba(30,60,80,.04);}
+.score-value{font-size:34px;font-weight:800;margin:10px 0 4px;color:#15905a;}
+.score-sub{font-size:11px;color:#718694;}
+.score-bars{margin-top:12px;display:grid;gap:8px;}
+.score-row{display:flex;justify-content:space-between;font-size:11px;color:#5d7480;}
+.score-row span:last-child{font-weight:700;color:#15905a;}
+.treatment-panel{display:none;margin-top:18px;background:white;border:1px solid #e1e9ee;border-radius:13px;padding:19px;}
+.treatment-panel.show{display:block;}
+.treatment-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.treatment-percent{font-weight:800;color:#168fc1;}
+.treatment-progress{height:9px;background:#e6eef2;border-radius:20px;overflow:hidden;}
+.treatment-fill{height:100%;width:0;background:#168fc1;transition:width .35s;}
+.treatment-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px;}
+.treat-step{font-size:10px;color:#7a8d98;text-align:center;padding:9px 5px;border-radius:8px;background:#f5f8fa;}
+.treat-step.active{background:#e6f6fb;color:#168fc1;font-weight:700;}
+.treat-step.done{background:#e5f7ee;color:#15905a;font-weight:700;}
+.report-btn{background:white;color:#526874;border:1px solid #d8e2e8;padding:9px 12px;font-size:11px;}
+.report-btn:hover{background:#f0f5f8;}
+@media(max-width:900px){.demo-grid{grid-template-columns:1fr}.treatment-steps{grid-template-columns:repeat(2,1fr)}}
+
+
+/* FINAL NAV / SECTION POLISH */
+html { scroll-behavior: smooth; }
+.nav-item { cursor: pointer; user-select: none; }
+.nav-item:active { transform: scale(.98); }
+#dashboardSection, #qualitySection, #treatmentSection, #microplasticSection, #verificationSection { scroll-margin-top: 18px; }
+.section-focus {
+  animation: sectionFocus 1.1s ease;
+}
+@keyframes sectionFocus {
+  0% { box-shadow: 0 0 0 0 rgba(34, 160, 210, 0); }
+  30% { box-shadow: 0 0 0 5px rgba(34, 160, 210, .16); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 160, 210, 0); }
+}
+
+.simulated-tag{display:inline-block;margin-left:8px;padding:3px 7px;border:1px solid #d7e5ee;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.5px;color:#6d8495;background:#f7fafc;vertical-align:middle;}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        <div class="logo-icon">💧</div>
+        <div>
+            <h2>AQUA SYS</h2>
+            <span>INTELLIGENT WATER SYSTEM</span>
+        </div>
+    </div>
+
+    <div class="nav" id="sideNav">
+        <div class="nav-item active" data-target="dashboardSection" onclick="sideNavGo('dashboardSection', this)">▦ &nbsp; Dashboard</div>
+        <div class="nav-item" data-target="qualitySection" onclick="sideNavGo('qualitySection', this)">◉ &nbsp; Water Quality</div>
+        <div class="nav-item" data-target="treatmentSection" onclick="sideNavGo('treatmentSection', this)">⚙ &nbsp; Treatment</div>
+        <div class="nav-item" data-target="microplasticSection" onclick="sideNavGo('microplasticSection', this)">⌁ &nbsp; Microplastic AI</div>
+        <div class="nav-item" data-target="verificationSection" onclick="sideNavGo('verificationSection', this)">✓ &nbsp; Verification</div>
+    </div>
+
+    <div class="sidebar-bottom">
+        <div class="sim-badge">
+            SOFTWARE SIMULATION
+        </div>
+    </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+    <div class="topbar" id="dashboardSection">
+
+        <div class="title">
+            <h1>Smart Water Purification</h1>
+            <p>Real-Time Water Quality Monitoring & Intelligent Treatment</p>
+        </div>
+
+        <div class="status-area">
+            <div class="online">● SYSTEM ONLINE</div>
+            <div class="time" id="clock">--:--:--</div>
+        </div>
+
+    </div>
+
+
+    <div class="controls">
+        <button class="start" id="startBtn" onclick="startSimulation()">
+            ▶ START LIVE SIMULATION
+        </button>
+
+        <button class="reset" onclick="resetDemo()">
+            ↻ RESET DEMO
+        </button>
+    </div>
+
+
+    <!-- METRICS -->
+
+    <div class="grid" id="qualitySection">
+
+        <div class="card">
+            <div class="metric-top">
+                <span class="metric-name">pH LEVEL</span>
+                <div class="metric-icon">pH</div>
+            </div>
+            <div class="metric-value" id="ph">7.1</div>
+            <div class="metric-status" id="phStatus">✓ NORMAL</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-top">
+                <span class="metric-name">TDS</span>
+                <div class="metric-icon">T</div>
+            </div>
+            <div class="metric-value" id="tds">420 ppm</div>
+            <div class="metric-status" id="tdsStatus">✓ NORMAL</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-top">
+                <span class="metric-name">TURBIDITY</span>
+                <div class="metric-icon">◌</div>
+            </div>
+            <div class="metric-value" id="turbidity">2 NTU</div>
+            <div class="metric-status" id="turbidityStatus">✓ NORMAL</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-top">
+                <span class="metric-name">TEMPERATURE</span>
+                <div class="metric-icon">°C</div>
+            </div>
+            <div class="metric-value" id="temperature">28.5°C</div>
+            <div class="metric-status" id="tempStatus">✓ NORMAL</div>
+        </div>
+
+    </div>
+
+
+    <!-- ALERT -->
+
+    <div class="alert" id="alert">
+        <strong>⚠ CONTAMINATION DETECTED</strong>
+        <p>Abnormal water quality parameters detected. Appropriate treatment has been activated.</p>
+    </div>
+
+
+    <div class="content">
+
+        <!-- WORKFLOW -->
+
+        <div class="card" id="treatmentSection">
+
+            <div class="card-title">
+                <h3>Treatment Workflow</h3>
+                <span class="small-label" id="progressText">0% COMPLETE</span>
+            </div>
+
+            <div class="workflow">
+
+                <div class="step" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-text">
+                        <div class="step-name">Water Extraction</div>
+                        <div class="step-status">PENDING</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-text">
+                        <div class="step-name">Water Quality Monitoring</div>
+                        <div class="step-status">PENDING</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-text">
+                        <div class="step-name">Contamination Detection</div>
+                        <div class="step-status">PENDING</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step4">
+                    <div class="step-number">4</div>
+                    <div class="step-text">
+                        <div class="step-name">Primary Filtration</div>
+                        <div class="step-status">PENDING</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step5">
+                    <div class="step-number">5</div>
+                    <div class="step-text">
+                        <div class="step-name">Heavy Metal Treatment</div>
+                        <div class="step-status">PENDING</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step6">
+                    <div class="step-number">6</div>
+                    <div class="step-text">
+                        <div class="step-name">Microplastic Detection</div>
+                        <div class="step-status">PENDING</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step7">
+                    <div class="step-number">7</div>
+                    <div class="step-text">
+                        <div class="step-name">Final Quality Verification</div>
+                        <div class="step-status">PENDING</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="log" id="log">
+                <div>> System initialized...</div>
+                <div>> Waiting for simulation...</div>
+            </div>
+
+        </div>
+
+
+        <!-- CHART -->
+
+        <div class="card">
+
+            <div class="card-title">
+                <h3>Water Quality Trend</h3>
+                <span class="small-label">LIVE</span>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="qualityChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MICROPLASTIC -->
+
+    <div class="card microplastic" id="microplasticSection">
+
+        <div class="card-title">
+            <h3>AI Microplastic Detection</h3>
+            <span class="small-label">LOCAL YOLO MODEL <span class="yolo-live-badge">LIVE</span></span>
+        </div>
+
+        <div class="yolo-controls">
+            <button class="yolo-btn" id="cameraBtn" onclick="toggleCamera()">📷 START CAMERA</button>
+            <button class="yolo-btn secondary" onclick="document.getElementById('imageInput').click()">📁 UPLOAD IMAGE</button>
+            <button class="yolo-btn secondary" id="captureBtn" onclick="captureFrame()" disabled>📸 CAPTURE & ANALYZE</button>
+            <input type="file" id="imageInput" accept="image/*" hidden onchange="analyzeUploadedImage(event)">
+        </div>
+
+        <div class="yolo-tools">
+            <div class="threshold-wrap">
+                <strong>Confidence Threshold</strong>
+                <input id="confSlider" type="range" min="0.25" max="0.75" step="0.05" value="0.25" oninput="updateConfLabel(this.value)" onchange="rerunAtThreshold()">
+                <span id="confValue">25%</span>
+            </div>
+            <button class="report-btn" onclick="downloadReport()">⬇ DOWNLOAD REPORT</button>
+        </div>
+
+        <div class="alert-panel" id="contaminationAlert">
+            <div>
+                <div class="alert-title">⚠ CANDIDATE CONTAMINATION DETECTED</div>
+                <div class="alert-text" id="alertText">YOLO identified candidate particles in the sample.</div>
+            </div>
+            <div class="alert-badge">TREATMENT SIMULATION</div>
+        </div>
+
+        <div class="camera-panel" id="cameraPanel" style="display:none;">
+            <video id="cameraVideo" autoplay playsinline></video>
+            <canvas id="captureCanvas" hidden></canvas>
+        </div>
+
+        <div class="micro-grid">
+
+            <div class="microscope" id="microscope"></div>
+
+            <div class="yolo-result-wrap">
+                <img id="yoloResultImage" alt="YOLO detection result" style="display:none;">
+                <div class="yolo-placeholder" id="yoloPlaceholder">
+                    Camera / image upload → YOLO analysis
+                </div>
+            </div>
+
+            <div class="ai-info">
+
+                <div class="small-label">DETECTED PARTICLES</div>
+
+                <div class="ai-number" id="particles">--</div>
+
+                <div class="ai-status" id="aiStatus">
+                    Waiting for analysis...
+                </div>
+
+                <div class="confidence">
+                    <div class="confidence-fill" id="confidence"></div>
+                </div>
+
+                <div class="small-label" style="margin-top:7px">
+                    Average Confidence: <span id="confidenceText">--</span>
+                </div>
+
+                <div class="yolo-summary" id="yoloSummary" style="display:none;">
+                    <div class="yolo-summary-title">DETECTION DETAILS</div>
+                    <div id="detectionDetails"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="demo-grid">
+        <div class="score-card">
+            <div class="card-title"><h3>Water Quality Score</h3><span class="small-label">DEMO SCORE</span></div>
+            <div class="score-value" id="qualityScore">94 / 100</div>
+            <div class="score-sub">Software simulation score — not a drinking-water certification.</div>
+            <div class="score-bars">
+                <div class="score-row"><span>pH</span><span id="scorePh">✓ NORMAL</span></div>
+                <div class="score-row"><span>TDS</span><span id="scoreTds">✓ NORMAL</span></div>
+                <div class="score-row"><span>Turbidity</span><span id="scoreTurb">✓ NORMAL</span></div>
+                <div class="score-row"><span>Temperature</span><span id="scoreTemp">✓ NORMAL</span></div>
+            </div>
+        </div>
+
+        <div class="history-card">
+            <div class="card-title"><h3>YOLO Detection History</h3><span class="small-label">LIVE</span></div>
+            <div class="chart-box" style="height:180px"><canvas id="detectionHistoryChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="treatment-panel" id="autoTreatment">
+        <div class="treatment-head">
+            <div><h3>Intelligent Treatment Response</h3><div class="small-label">AUTOMATED SOFTWARE SIMULATION</div></div>
+            <div class="treatment-percent" id="treatmentPercent">0%</div>
+        </div>
+        <div class="treatment-progress"><div class="treatment-fill" id="treatmentFill"></div></div>
+        <div class="treatment-steps">
+            <div class="treat-step" id="treat1">Filtration</div>
+            <div class="treat-step" id="treat2">Heavy Metal</div>
+            <div class="treat-step" id="treat3">Microplastic</div>
+            <div class="treat-step" id="treat4">Verification</div>
+        </div>
+    </div>
+
+    <!-- COMPARISON -->
+
+    <div class="card comparison">
+
+        <div class="card-title">
+            <h3>Before vs After Treatment</h3>
+            <span class="small-label">SIMULATED RESULTS</span>
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>PARAMETER</th>
+                    <th>BEFORE</th>
+                    <th>AFTER</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>pH</td>
+                    <td>6.2</td>
+                    <td class="after">7.1</td>
+                </tr>
+
+                <tr>
+                    <td>TDS</td>
+                    <td>920 ppm</td>
+                    <td class="after">480 ppm</td>
+                </tr>
+
+                <tr>
+                    <td>Turbidity</td>
+                    <td>14 NTU</td>
+                    <td class="after">2 NTU</td>
+                </tr>
+
+                <tr>
+                    <td>Temperature</td>
+                    <td>29.4°C</td>
+                    <td class="after">28.7°C</td>
+                </tr>
+
+                <tr>
+                    <td>Microplastic Particles</td>
+                    <td>17</td>
+                    <td class="after">1</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- FINAL -->
+
+    <div class="final pending" id="verificationSection">
+
+        <div id="final" class="final-inner pending">
+
+        <div class="final-icon" id="finalIcon">○</div>
+
+        <h2 id="finalTitle">Final Verification Pending</h2>
+
+        <p id="finalText">
+            Start the live simulation to begin the complete treatment workflow.
+        </p>
+
+        </div>
+    </div>
+
+</main>
+
+</div>
+
+
+<script>
+
+/* =========================
+   CLOCK
+========================= */
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerText =
+        now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+updateClock();
+
+
+/* =========================
+   CHART
+========================= */
+
+/* Chart.js is optional. If CDN is unavailable, use a lightweight canvas fallback. */
+function fallbackChart(canvas, initialLabels, initialDatasets){
+    const obj = {
+        data: { labels: initialLabels.slice(), datasets: initialDatasets.map(d => ({...d, data: d.data.slice()})) },
+        update: function(){
+            const c = canvas; if(!c) return;
+            const rect = c.getBoundingClientRect();
+            const w = Math.max(320, Math.floor(rect.width || 600));
+            const h = Math.max(180, Math.floor(rect.height || 240));
+            const dpr = window.devicePixelRatio || 1;
+            c.width = w*dpr; c.height = h*dpr;
+            const g = c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
+            g.clearRect(0,0,w,h);
+            g.font = '11px Arial'; g.fillStyle = '#64748b';
+            const pad={l:42,r:14,t:18,b:28};
+            const pw=w-pad.l-pad.r, ph=h-pad.t-pad.b;
+            const all = obj.data.datasets.flatMap(d=>d.data.map(Number).filter(Number.isFinite));
+            const max = Math.max(10, ...(all.length?all:[10]));
+            const labels=obj.data.labels;
+            for(let i=0;i<=4;i++){
+                const y=pad.t+ph*i/4; const val=Math.round(max*(1-i/4));
+                g.strokeStyle='#e5e7eb'; g.lineWidth=1; g.beginPath(); g.moveTo(pad.l,y); g.lineTo(w-pad.r,y); g.stroke();
+                g.fillText(String(val),5,y+4);
+            }
+            obj.data.datasets.forEach((ds,di)=>{
+                const vals=ds.data.map(Number); if(!vals.length) return;
+                g.strokeStyle=['#2aa6cf','#ef5b79','#f59e0b'][di%3]; g.lineWidth=2; g.beginPath();
+                vals.forEach((v,i)=>{ const x=pad.l+(labels.length<=1?pw/2:pw*i/(labels.length-1)); const y=pad.t+ph-(v/max)*ph; if(i===0) g.moveTo(x,y); else g.lineTo(x,y); });
+                g.stroke();
+            });
+            labels.forEach((lab,i)=>{ if(i%Math.max(1,Math.ceil(labels.length/6))!==0 && i!==labels.length-1) return; const x=pad.l+(labels.length<=1?pw/2:pw*i/(labels.length-1)); g.fillStyle='#64748b'; g.fillText(String(lab),x-10,h-8); });
+        }
+    };
+    obj.update();
+    return obj;
+}
+
+const ctx = document.getElementById("qualityChart");
+const chart = (typeof Chart !== 'undefined') ? new Chart(ctx,{
+    type:"line",
+    data:{labels:["Start"],datasets:[
+        {label:"pH",data:[7.1],tension:.35,borderWidth:2},
+        {label:"TDS",data:[420],tension:.35,borderWidth:2},
+        {label:"Turbidity",data:[2],tension:.35,borderWidth:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}
+}) : fallbackChart(ctx,["Start"],[
+    {label:"pH",data:[7.1]},{label:"TDS",data:[420]},{label:"Turbidity",data:[2]}
+]);
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let running = false;
+let chartCounter = 0;
+let lastBlob = null;
+let lastFilename = "sample.jpg";
+let lastDetectionData = null;
+let detectionHistory = [];
+let treatmentRunning = false;
+
+const detectionHistoryCtx = document.getElementById("detectionHistoryChart");
+const detectionHistoryChart = (typeof Chart !== 'undefined') ? new Chart(detectionHistoryCtx,{
+    type:"line",data:{labels:[],datasets:[{label:"Candidate Objects",data:[],tension:.35,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{stepSize:1}}}}
+}) : fallbackChart(detectionHistoryCtx,[],[{label:"Candidate Objects",data:[]}]);
+
+
+/* =========================
+   LOG
+========================= */
+
+function log(message){
+
+    const box = document.getElementById("log");
+
+    const item = document.createElement("div");
+
+    item.innerText =
+        "> " + message;
+
+    box.appendChild(item);
+
+    box.scrollTop =
+        box.scrollHeight;
+}
+
+
+/* =========================
+   STEP CONTROL
+========================= */
+
+function setStep(number,status){
+
+    const step =
+        document.getElementById("step"+number);
+
+    const statusElement =
+        step.querySelector(".step-status");
+
+    step.classList.remove(
+        "active",
+        "completed"
+    );
+
+    statusElement.classList.remove(
+        "processing",
+        "completed"
+    );
+
+    if(status === "PROCESSING"){
+
+        step.classList.add("active");
+
+        statusElement.classList.add(
+            "processing"
+        );
+
+        statusElement.innerText =
+            "PROCESSING";
+
+    }
+
+    else if(status === "COMPLETED"){
+
+        step.classList.add("completed");
+
+        statusElement.classList.add(
+            "completed"
+        );
+
+        statusElement.innerText =
+            "✓ COMPLETED";
+
+        step.querySelector(
+            ".step-number"
+        ).innerText = "✓";
+
+    }
+
+    else{
+
+        statusElement.innerText =
+            "PENDING";
+
+    }
+
+}
+
+
+/* =========================
+   VALUE UPDATE
+========================= */
+
+function setValues(
+    ph,
+    tds,
+    turbidity,
+    temperature
+){
+
+    document.getElementById("ph")
+        .innerText = ph;
+
+    document.getElementById("tds")
+        .innerText = tds + " ppm";
+
+    document.getElementById("turbidity")
+        .innerText = turbidity + " NTU";
+
+    document.getElementById("temperature")
+        .innerText = temperature + "°C";
+
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+function abnormalStatus(){
+
+    const statuses = [
+        "phStatus",
+        "tdsStatus",
+        "turbidityStatus"
+    ];
+
+    statuses.forEach(id=>{
+
+        const el =
+            document.getElementById(id);
+
+        el.innerText =
+            "⚠ ABNORMAL";
+
+        el.classList.remove(
+            "metric-status"
+        );
+
+        el.classList.add(
+            "danger"
+        );
+
+    });
+
+}
+
+
+/* =========================
+   NORMAL STATUS
+========================= */
+
+function normalStatus(){
+
+    const statuses = [
+        "phStatus",
+        "tdsStatus",
+        "turbidityStatus",
+        "tempStatus"
+    ];
+
+    statuses.forEach(id=>{
+
+        const el =
+            document.getElementById(id);
+
+        el.innerText =
+            "✓ NORMAL";
+
+        el.className =
+            "metric-status";
+
+    });
+
+}
+
+
+/* =========================
+   CHART UPDATE
+========================= */
+
+function updateChart(
+    ph,
+    tds,
+    turbidity
+){
+
+    chartCounter++;
+
+    chart.data.labels.push(
+        chartCounter + "s"
+    );
+
+    chart.data.datasets[0]
+        .data.push(ph);
+
+    chart.data.datasets[1]
+        .data.push(tds);
+
+    chart.data.datasets[2]
+        .data.push(turbidity);
+
+    if(chart.data.labels.length > 12){
+
+        chart.data.labels.shift();
+
+        chart.data.datasets.forEach(
+            dataset=>{
+                dataset.data.shift();
+            }
+        );
+
+    }
+
+    chart.update("none");
+
+}
+
+
+/* =========================
+   WAIT
+========================= */
+
+function wait(ms){
+
+    return new Promise(
+        resolve => setTimeout(
+            resolve,
+            ms
+        )
+    );
+
+}
+
+
+/* =========================
+   SIMULATION
+========================= */
+
+async function startSimulation(){
+
+    if(running) return;
+
+    running = true;
+
+    document.getElementById(
+        "startBtn"
+    ).disabled = true;
+
+    document.getElementById(
+        "startBtn"
+    ).innerText =
+        "● SIMULATION RUNNING";
+
+    log("Live simulation started.");
+    log("Monitoring simulated water parameters...");
+
+    /* STEP 1 */
+
+    setStep(1,"PROCESSING");
+
+    await wait(2500);
+
+    setStep(1,"COMPLETED");
+
+    log("Water extraction completed.");
+
+    /* STEP 2 */
+
+    setStep(2,"PROCESSING");
+
+    await wait(2500);
+
+    setStep(2,"COMPLETED");
+
+    log("Water quality monitoring completed.");
+
+    /* STEP 3 */
+
+    setStep(3,"PROCESSING");
+
+    await wait(2000);
+
+    setValues(
+        "6.2",
+        920,
+        14,
+        "29.4"
+    );
+
+    abnormalStatus();
+
+    document.getElementById(
+        "alert"
+    ).classList.add("show");
+
+    updateChart(
+        6.2,
+        920,
+        14
+    );
+
+    log("Abnormal pH detected: 6.2");
+    log("High TDS detected: 920 ppm");
+    log("High turbidity detected: 14 NTU");
+    log("Contamination detected.");
+
+    await wait(1800);
+
+    setStep(3,"COMPLETED");
+
+    /* STEP 4 */
+
+    setStep(4,"PROCESSING");
+
+    log("Primary filtration activated.");
+
+    await wait(4000);
+
+    setStep(4,"COMPLETED");
+
+    log("Primary filtration completed.");
+
+    /* STEP 5 */
+
+    setStep(5,"PROCESSING");
+
+    log("Heavy metal treatment activated.");
+
+    await wait(4000);
+
+    setStep(5,"COMPLETED");
+
+    log("Electrochemical treatment completed.");
+
+    /* STEP 6 */
+
+    setStep(6,"PROCESSING");
+
+    document.getElementById(
+        "aiStatus"
+    ).innerText =
+        "Analyzing microscopic sample...";
+
+    // Keep YOLO panel unchanged until a real image is analyzed.
+    if(!lastDetectionData){
+        document.getElementById("particles").innerText = "--";
+    }
+
+    document.getElementById(
+        "microscope"
+    ).classList.add("detecting");
+
+    log("Microplastic image analysis started.");
+
+    await wait(4000);
+
+    document.getElementById(
+        "aiStatus"
+    ).innerText =
+        "Detection completed.";
+
+    if(!lastDetectionData){
+        document.getElementById("confidence").style.width = "0%";
+        document.getElementById("confidenceText").innerText = "--";
+        document.getElementById("aiStatus").innerText = "Waiting for image analysis...";
+    }
+
+    if(lastDetectionData){
+        log("Live YOLO result preserved; treatment workflow remains simulated.");
+    } else {
+        log("No YOLO image analyzed during simulation.");
+    }
+
+    setStep(6,"COMPLETED");
+
+    /* TREATMENT IMPROVEMENT */
+
+    await wait(1000);
+
+    log("Treatment optimization in progress.");
+
+    setValues(
+        "6.7",
+        720,
+        9,
+        "29.1"
+    );
+
+    updateChart(
+        6.7,
+        720,
+        9
+    );
+
+    await wait(1800);
+
+    setValues(
+        "6.9",
+        590,
+        5,
+        "28.9"
+    );
+
+    updateChart(
+        6.9,
+        590,
+        5
+    );
+
+    await wait(1800);
+
+    setValues(
+        "7.1",
+        480,
+        2,
+        "28.7"
+    );
+
+    updateChart(
+        7.1,
+        480,
+        2
+    );
+
+    /* MICROPLASTIC AFTER */
+
+    if(lastDetectionData){
+        log("Live YOLO result preserved; treatment outcome remains a software simulation.");
+    } else {
+        log("No YOLO result available; upload/capture an image to run AI detection.");
+    }
+
+    /* NORMAL */
+
+    normalStatus();
+
+    document.getElementById(
+        "alert"
+    ).classList.remove("show");
+
+    /* STEP 7 */
+
+    setStep(7,"PROCESSING");
+
+    log("Final water quality verification started.");
+
+    await wait(3500);
+
+    setStep(7,"COMPLETED");
+
+    /* FINAL */
+
+    document.getElementById(
+        "final"
+    ).classList.remove("pending");
+
+    document.getElementById(
+        "finalIcon"
+    ).innerText =
+        "✓";
+
+    document.getElementById(
+        "finalTitle"
+    ).innerText =
+        "WATER QUALITY ACCEPTABLE";
+
+    document.getElementById(
+        "finalText"
+    ).innerText =
+        "Treatment workflow completed successfully. Simulated water quality is within the acceptable demonstration range.";
+
+    document.getElementById(
+        "progressText"
+    ).innerText =
+        "100% COMPLETE";
+
+    log("Final verification completed.");
+    log("Water quality acceptable.");
+    log("Simulation completed successfully.");
+
+    document.getElementById(
+        "startBtn"
+    ).innerText =
+        "✓ SIMULATION COMPLETED";
+
+    running = false;
+
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetDemo(){
+
+    running = false;
+
+    document.getElementById(
+        "startBtn"
+    ).disabled = false;
+
+    document.getElementById(
+        "startBtn"
+    ).innerText =
+        "▶ START LIVE SIMULATION";
+
+    setValues(
+        "7.1",
+        420,
+        2,
+        "28.5"
+    );
+
+    normalStatus();
+
+    document.getElementById(
+        "alert"
+    ).classList.remove("show");
+
+    document.getElementById(
+        "particles"
+    ).innerText =
+        "--";
+
+    document.getElementById(
+        "aiStatus"
+    ).innerText =
+        "Waiting for analysis...";
+
+    document.getElementById(
+        "confidence"
+    ).style.width =
+        "0%";
+
+    document.getElementById(
+        "confidenceText"
+    ).innerText =
+        "--";
+
+    document.getElementById("confSlider").value = "0.25";
+    updateConfLabel("0.25");
+    document.getElementById("contaminationAlert").classList.remove("show");
+    document.getElementById("autoTreatment").classList.remove("show");
+    document.getElementById("treatmentFill").style.width="0%";
+    document.getElementById("treatmentPercent").innerText="0%";
+    lastBlob=null; lastDetectionData=null; detectionHistory=[];
+    detectionHistoryChart.data.labels=[]; detectionHistoryChart.data.datasets[0].data=[]; detectionHistoryChart.update("none");
+    updateQualityScore();
+
+    document.getElementById(
+        "microscope"
+    ).classList.remove("detecting");
+
+    for(let i=1;i<=7;i++){
+
+        const step =
+            document.getElementById(
+                "step"+i
+            );
+
+        step.classList.remove(
+            "active",
+            "completed"
+        );
+
+        step.querySelector(
+            ".step-number"
+        ).innerText = i;
+
+        step.querySelector(
+            ".step-status"
+        ).innerText =
+            "PENDING";
+
+        step.querySelector(
+            ".step-status"
+        ).className =
+            "step-status";
+
+    }
+
+    document.getElementById(
+        "progressText"
+    ).innerText =
+        "0% COMPLETE";
+
+    document.getElementById(
+        "final"
+    ).classList.add("pending");
+
+    document.getElementById(
+        "finalIcon"
+    ).innerText =
+        "○";
+
+    document.getElementById(
+        "finalTitle"
+    ).innerText =
+        "Final Verification Pending";
+
+    document.getElementById(
+        "finalText"
+    ).innerText =
+        "Start the live simulation to begin the complete treatment workflow.";
+
+    document.getElementById(
+        "log"
+    ).innerHTML = `
+        <div>> System initialized...</div>
+        <div>> Waiting for simulation...</div>
+    `;
+
+    chart.data.labels =
+        ["Start"];
+
+    chart.data.datasets[0].data =
+        [7.1];
+
+    chart.data.datasets[1].data =
+        [420];
+
+    chart.data.datasets[2].data =
+        [2];
+
+    chart.update();
+
+    chartCounter = 0;
+
+}
+
+
+
+/* =========================
+   LIVE YOLO MICROPLASTIC DETECTION
+   ========================= */
+
+let cameraStream = null;
+
+async function toggleCamera(){
+    const panel = document.getElementById("cameraPanel");
+    const video = document.getElementById("cameraVideo");
+    const btn = document.getElementById("cameraBtn");
+    const captureBtn = document.getElementById("captureBtn");
+
+    if(cameraStream){
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+        panel.style.display = "none";
+        captureBtn.disabled = true;
+        btn.innerText = "📷 START CAMERA";
+        log("Camera stopped.");
+        return;
+    }
+
+    try{
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video:{facingMode:"environment"},
+            audio:false
+        });
+        video.srcObject = cameraStream;
+        panel.style.display = "block";
+        captureBtn.disabled = false;
+        btn.innerText = "⏹ STOP CAMERA";
+        log("Camera started. Capture a microscopic sample for YOLO analysis.");
+    }catch(err){
+        alert("Camera access failed. Please allow camera permission or use UPLOAD IMAGE.");
+        log("Camera access failed.");
+    }
+}
+
+function captureFrame(){
+    const video = document.getElementById("cameraVideo");
+    const canvas = document.getElementById("captureCanvas");
+
+    if(!cameraStream || !video.videoWidth){
+        alert("Start the camera first.");
+        return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height);
+
+    canvas.toBlob(blob => {
+        if(blob) analyzeBlob(blob, "camera_capture.jpg");
+    }, "image/jpeg", 0.92);
+}
+
+function analyzeUploadedImage(event){
+    const file = event.target.files[0];
+    if(file) analyzeBlob(file, file.name);
+}
+
+function updateConfLabel(value){
+    document.getElementById("confValue").innerText = Math.round(parseFloat(value)*100) + "%";
+}
+
+async function rerunAtThreshold(){
+    if(lastBlob){
+        await analyzeBlob(lastBlob,lastFilename,true);
+    }
+}
+
+function updateQualityScore(){
+    const ph=parseFloat(document.getElementById("ph").innerText)||7.1;
+    const tds=parseFloat(document.getElementById("tds").innerText)||480;
+    const turb=parseFloat(document.getElementById("turbidity").innerText)||2;
+    const temp=parseFloat(document.getElementById("temperature").innerText)||28.7;
+    let score=100;
+    if(ph<6.5||ph>8.5) score-=15;
+    if(tds>500) score-=10;
+    if(turb>5) score-=15;
+    if(temp<15||temp>35) score-=5;
+    score=Math.max(0,Math.min(100,score));
+    document.getElementById("qualityScore").innerText=score+" / 100";
+    document.getElementById("scorePh").innerText=(ph>=6.5&&ph<=8.5)?"✓ NORMAL":"⚠ CHECK";
+    document.getElementById("scoreTds").innerText=(tds<=500)?"✓ NORMAL":"⚠ HIGH";
+    document.getElementById("scoreTurb").innerText=(turb<=5)?"✓ NORMAL":"⚠ HIGH";
+    document.getElementById("scoreTemp").innerText=(temp>=15&&temp<=35)?"✓ NORMAL":"⚠ CHECK";
+}
+
+function updateDetectionHistory(count){
+    detectionHistory.push(count);
+    if(detectionHistory.length>8) detectionHistory.shift();
+    detectionHistoryChart.data.labels=detectionHistory.map((_,i)=>"S"+(i+1));
+    detectionHistoryChart.data.datasets[0].data=detectionHistory;
+    detectionHistoryChart.update("none");
+}
+
+async function runTreatmentSimulation(count){
+    if(treatmentRunning || count<=0) return;
+    treatmentRunning=true;
+    const panel=document.getElementById("autoTreatment");
+    panel.classList.add("show");
+    const fill=document.getElementById("treatmentFill");
+    const pct=document.getElementById("treatmentPercent");
+    const steps=["treat1","treat2","treat3","treat4"];
+    steps.forEach(id=>document.getElementById(id).className="treat-step");
+    const stages=[25,50,75,100];
+    for(let i=0;i<stages.length;i++){
+        document.getElementById(steps[i]).classList.add("active");
+        await wait(450);
+        document.getElementById(steps[i]).classList.remove("active");
+        document.getElementById(steps[i]).classList.add("done");
+        fill.style.width=stages[i]+"%"; pct.innerText=stages[i]+"%";
+    }
+    log("Automated treatment simulation completed.");
+    treatmentRunning=false;
+}
+
+function downloadReport(){
+    const d=lastDetectionData;
+    const lines=[
+        "AQUA SYS - SMART WATER PURIFICATION REPORT",
+        "=============================================",
+        "Generated: "+new Date().toLocaleString(),
+        "",
+        "WATER QUALITY",
+        "pH: "+document.getElementById("ph").innerText,
+        "TDS: "+document.getElementById("tds").innerText,
+        "Turbidity: "+document.getElementById("turbidity").innerText,
+        "Temperature: "+document.getElementById("temperature").innerText,
+        "Demo Quality Score: "+document.getElementById("qualityScore").innerText,
+        "",
+        "YOLO ANALYSIS",
+        "Confidence Threshold: "+document.getElementById("confValue").innerText,
+        "Candidate Objects: "+(d?d.count:"Not analyzed"),
+        "Average Confidence: "+(d?(d.average_confidence*100).toFixed(1)+"%":"--")
+    ];
+    if(d && d.detections.length){
+        lines.push("", "DETECTION DETAILS");
+        d.detections.forEach((x,i)=>lines.push((i+1)+". "+x.class_name+" - "+(x.confidence*100).toFixed(1)+"%"));
+    }
+    lines.push("", "NOTE: YOLO output represents candidate detections from the trained model. This dashboard is a software demonstration and does not certify water as safe to drink.");
+    const blob=new Blob([lines.join("\n")],{type:"text/plain"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="AQUA_SYS_Report.txt"; a.click(); URL.revokeObjectURL(a.href);
+}
+
+async function analyzeBlob(blob, filename, silent=false){
+    const status = document.getElementById("aiStatus");
+    const particles = document.getElementById("particles");
+    const confidence = document.getElementById("confidence");
+    const confidenceText = document.getElementById("confidenceText");
+    const resultImage = document.getElementById("yoloResultImage");
+    const placeholder = document.getElementById("yoloPlaceholder");
+    const summary = document.getElementById("yoloSummary");
+    const details = document.getElementById("detectionDetails");
+
+    lastBlob = blob;
+    lastFilename = filename;
+    const threshold = parseFloat(document.getElementById("confSlider").value || "0.25");
+    status.innerText = "Running YOLO inference...";
+    particles.innerText = "…";
+    confidence.style.width = "0%";
+    confidenceText.innerText = "--";
+    summary.style.display = "none";
+    details.innerHTML = "";
+    log("Sending " + filename + " to local YOLO model...");
+
+    const formData = new FormData();
+    formData.append("file", blob, filename);
+    formData.append("conf", threshold.toString());
+
+    try{
+        const response = await fetch("/api/detect", {
+            method:"POST",
+            body:formData
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error(data.error || "Detection failed");
+        }
+
+        resultImage.src = data.image;
+        resultImage.style.display = "block";
+        placeholder.style.display = "none";
+
+        particles.innerText = data.count;
+        status.innerText = data.count
+            ? "YOLO detection completed."
+            : "No objects detected.";
+
+        lastDetectionData = data;
+        updateDetectionHistory(data.count);
+        const alert = document.getElementById("contaminationAlert");
+        const alertText = document.getElementById("alertText");
+        if(data.count > 0){
+            alert.classList.add("show");
+            alertText.innerText = data.count + " candidate object(s) detected. Treatment response has been triggered in software simulation.";
+        } else {
+            alert.classList.remove("show");
+            alertText.innerText = "No candidate objects detected.";
+        }
+
+        const avg = data.average_confidence || 0;
+        const avgPct = (avg * 100).toFixed(1);
+
+        confidence.style.width = avgPct + "%";
+        confidenceText.innerText = data.detections.length ? avgPct + "%" : "0%";
+
+        if(data.detections.length){
+            summary.style.display = "block";
+            const counts = {};
+            data.detections.forEach(d => {
+                counts[d.class_name] = (counts[d.class_name] || 0) + 1;
+            });
+            Object.entries(counts).forEach(([name, count]) => {
+                const items = data.detections.filter(d => d.class_name === name);
+                const classAvg = items.reduce((sum, d) => sum + d.confidence, 0) / items.length;
+                const row = document.createElement("div");
+                row.className = "detection-row";
+                row.innerHTML = `<span><strong>${name}</strong> × ${count}</span><span>${(classAvg*100).toFixed(1)}%</span>`;
+                details.appendChild(row);
+            });
+        }
+
+        status.innerText = data.count
+            ? (avg < 0.50 ? "YOLO candidate detection completed — low confidence." : "YOLO candidate detection completed.")
+            : "No candidate objects detected.";
+
+        log("YOLO detected " + data.count + " object(s).");
+        if(data.detections.length){
+            log("Classes: " + data.detections.map(d => d.class_name).join(", "));
+            log("Average confidence: " + avgPct + "%");
+        }
+
+    }catch(err){
+        status.innerText = "YOLO connection failed.";
+        particles.innerText = "--";
+        confidenceText.innerText = "--";
+        log("ERROR: " + err.message);
+        alert("YOLO backend not running. Start app.py first.");
+    }
+}
+
+
+
+
+/* BULLETPROOF SIDEBAR NAVIGATION */
+window.sideNavGo = function(id, el){
+    document.querySelectorAll('#sideNav .nav-item').forEach(function(n){ n.classList.remove('active'); });
+    if(el) el.classList.add('active');
+    var target = document.getElementById(id);
+    if(!target) return;
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+    target.classList.remove('section-focus');
+    void target.offsetWidth;
+    target.classList.add('section-focus');
+};
+
+/* =========================
+   SIDEBAR NAVIGATION
+========================= */
+(function setupSectionNavigation(){
+    const items = Array.from(document.querySelectorAll('#sideNav .nav-item'));
+    const targets = items.map(item => document.getElementById(item.dataset.target)).filter(Boolean);
+
+    function setActive(targetId){
+        items.forEach(item => item.classList.toggle('active', item.dataset.target === targetId));
+    }
+
+    window.navigateTo = function(targetId){
+        const target = document.getElementById(targetId);
+        if(!target) return;
+        const y = target.getBoundingClientRect().top + window.pageYOffset - 18;
+        setActive(targetId);
+        window.scrollTo({top: Math.max(0, y), behavior:'smooth'});
+        target.classList.remove('section-focus');
+        void target.offsetWidth;
+        target.classList.add('section-focus');
+        setTimeout(() => target.classList.remove('section-focus'), 1200);
+    };
+
+    items.forEach(item => {
+        item.setAttribute('role','button');
+        item.setAttribute('tabindex','0');
+        item.addEventListener('click', () => navigateTo(item.dataset.target));
+        item.addEventListener('keydown', e => {
+            if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); navigateTo(item.dataset.target); }
+        });
+    });
+})();
+
+/* INITIAL */
+
+resetDemo();
+
+
+updateQualityScore();
+updateConfLabel("0.25");
+</script>
+
+</body>
+</html>
